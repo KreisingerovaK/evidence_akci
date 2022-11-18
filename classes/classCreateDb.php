@@ -60,20 +60,21 @@ class CreateDb
     self::createTableEvents();
     self::createTableTypes();
     self::createTableTypesEvents();
-    self::createTableAttachment();
+    self::createTableFile();
   }
 
   // Metoda pro vytvoreni tabulky akce
   private function createTableEvents()
   {
     $sql = "CREATE TABLE Events (
-      eventId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      eventName VARCHAR(250) NOT NULL,
-      eventFrom DATETIME NOT NULL,
-      eventTo DATETIME NOT NULL,
-      numberParticipant INT(255) UNSIGNED,
-      note VARCHAR(300)
-      )";
+              eventId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+              eventName VARCHAR(250) NOT NULL,
+              typeId INT REFERENCES Types(typeId), 
+              eventFrom DATETIME NOT NULL,
+              eventTo DATETIME NOT NULL,
+              numberParticipant INT(255) UNSIGNED,
+              note VARCHAR(300)
+            )";
     try
     {
       $this->connection->query($sql);
@@ -88,9 +89,9 @@ class CreateDb
   private function createTableTypes()
   {
     $sql = "CREATE TABLE Types (
-      typeId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      typeName VARCHAR(250) NOT NULL
-      )";
+              typeId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+              typeName VARCHAR(250) NOT NULL
+            )";
     try
     {
       $this->connection->query($sql);
@@ -99,15 +100,33 @@ class CreateDb
     {
       die ('<strong>Tabulku Types se nepodařilo vytvořit: </strong>'.$e->getMessage());
     }
+    $sql = "INSERT INTO types 
+              (typeName)
+            VALUES 
+              ('test1')
+            ;";
+    $this->connection->query($sql);
+    $sql = "INSERT INTO types 
+              (typeName)
+            VALUES 
+              ('test2')
+            ;";
+    $this->connection->query($sql);
+    $sql = "INSERT INTO types 
+              (typeName)
+            VALUES 
+              ('test3')
+            ;";
+    $this->connection->query($sql);
   }
 
   // Metoda pro vytvoreni tabulky typy akci
   private function createTableTypesEvents()
   {
     $sql = "CREATE TABLE TypesEvents (
-      typeId INT REFERENCES Types(typeId),
-      eventId INT REFERENCES Events(eventId)
-      )";
+              typeId INT REFERENCES Types(typeId),
+              eventId INT REFERENCES Events(eventId)
+            )";
     try
     {
       $this->connection->query($sql);
@@ -119,21 +138,21 @@ class CreateDb
   }
 
   // Metoda pro vytvoreni tabulky prilohy
-  private function createTableAttachment()
+  private function createTableFile()
   {
-    $sql = "CREATE TABLE Attachment (
-      attachmentId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      eventId INT REFERENCES Events(eventId),
-      attachmentName VARCHAR(250) NOT NULL,
-      content LONGBLOB NOT NULL
-      )";
+    $sql = "CREATE TABLE File (
+              fileId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+              eventId INT REFERENCES Events(eventId),
+              fileName VARCHAR(250) NOT NULL,
+              content LONGBLOB NOT NULL
+            )";
     try
     {
       $this->connection->query($sql);
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Tabulku Attachment se nepodařilo vytvořit: </strong>'.$e->getMessage());
+      die ('<strong>Tabulku File se nepodařilo vytvořit: </strong>'.$e->getMessage());
     }
   }
 }

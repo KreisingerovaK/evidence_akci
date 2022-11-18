@@ -18,6 +18,49 @@ class Db
     }
   }
 
+  // Metoda pro vypsani vseho v tabulce
+  function selectAll($tableName)
+  {
+    try
+    {
+      $sql = 'SELECT * FROM '.$tableName;
+      $result = $this->connection->query($sql);
+      return $result;
+    }
+    catch (mysqli_sql_exception $e)
+    {
+      echo '<strong></strong>'.$e->getMessage();
+    }
+  }
+
+  // Metoda pro odeslani sql 
+  function sql($sql)
+  {
+    try
+    {
+      $result = $this->connection->query($sql);
+      return $result;
+    }
+    catch (mysqli_sql_exception $e)
+    {
+      echo '<strong></strong>'.$e->getMessage();
+    }
+  }
+
+  // Metoda pro zjisteni id poslednich odeslanych dat
+  function getId()
+  {
+    try
+    {
+      $result = $this->connection->insert_id;
+      return $result;
+    }
+    catch (mysqli_sql_exception $e)
+    {
+      echo '<strong></strong>'.$e->getMessage();
+    }
+  }
+
   // Metoda pro odpojeni z databaze
   function disconnect ()
   {
