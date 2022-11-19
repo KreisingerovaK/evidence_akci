@@ -4,9 +4,17 @@ require_once('classes/classHtml.php');
 class Form
 {
   // Metoda pro vytvoreni hlavicky formulare
-  function headerForm()
+  function headerForm($class, $action)
   {
-    $form = '<form class="form-horizontal" action="create.php" method="post" enctype="multipart/form-data">';
+    $form = '<form class="'.$class.'" action="'.$action.'" method="post" enctype="multipart/form-data">';
+    echo $form;
+  }
+
+  // Metoda pro vytvoreni konce formulare
+  function endForm($value, $class)
+  {
+    $form = '<input id="button" name="submit" class="'.$class.'" type="submit" value="'.$value.'">';
+    $form .= '</form>';
     echo $form;
   }
 
@@ -27,6 +35,7 @@ class Form
     $form = '<div class="form-group pb-2">';
       $form .= '<label class="control-label col-sm-3">'.$text.'</label>';
       $form .= '<select id="'.$id.'" name="'.$name.'" class="control-label col-sm-2">';
+        $form .= '<option value="0">Vyberte možnost...</option>';
         while($row = $options->fetch_assoc()) 
         {
           $form .= '<option value="'.$row["typeId"].'">'.$row["typeName"].'</option>';
@@ -52,11 +61,36 @@ class Form
     echo $form;
   }
 
-  // Metoda pro vytvoreni konce formulare
-  function endForm()
+  // Metoda pro vytvoreni textarey
+  function formTextarea($text, $name, $class)
   {
-    $form = '<input id="button" name="submit" class="btn btn-secondary col-sm-2" type="submit" value=" Uložit ">';
-    $form .= '</form>';
+    $form = '<div class="form-group">';
+      $form .= '<label class="control-label col-sm-3">'.$text.'</label>';
+      $form .= '<textarea class="'.$class.'" rows="3" name="'.$name.'"></textarea>';
+      $form .= '<input type="hidden" class="col-sm-6">';
+    $form .= '</div>';
+    echo $form;
+  }
+  
+  // Metoda pro vytvoreni pole formulare
+  function formFieldFilter($text, $type, $name)
+  {
+      $form = '<label>'.$text.'&nbsp;</label>';
+      $form .= '<input name="'.$name.'" type="'.$type.'" style="margin-right: 15px;">';
+    echo $form;
+  }
+
+  // Metoda pro vytvoreni selectu formulare
+  function formSelectFilter($text, $options, $name)
+  {
+    $form = '<label>'.$text.'&nbsp;</label>';
+    $form .= '<select name="'.$name.'" style="margin-right: 15px;">';
+      $form .= '<option value="0">Vyberte možnost...</option>';
+      while($row = $options->fetch_assoc()) 
+      {
+        $form .= '<option value="'.$row["typeId"].'">'.$row["typeName"].'</option>';
+      }
+    $form .= '</select>';
     echo $form;
   }
 }

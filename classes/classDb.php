@@ -23,7 +23,32 @@ class Db
   {
     try
     {
-      $sql = 'SELECT * FROM '.$tableName;
+      $sql = 'SELECT 
+                * 
+              FROM 
+                '.$tableName
+              ;
+      $result = $this->connection->query($sql);
+      return $result;
+    }
+    catch (mysqli_sql_exception $e)
+    {
+      echo '<strong></strong>'.$e->getMessage();
+    }
+  }
+
+  // Metoda pro vypsani podminenych zaznamu
+  function selectWhere($tableName, $where)
+  {
+    try
+    {
+      $sql = 'SELECT 
+                * 
+              FROM 
+                '.$tableName.' 
+              WHERE
+                '.$where.'
+              ';
       $result = $this->connection->query($sql);
       return $result;
     }

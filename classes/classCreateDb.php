@@ -143,8 +143,7 @@ class CreateDb
     $sql = "CREATE TABLE File (
               fileId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
               eventId INT REFERENCES Events(eventId),
-              fileName VARCHAR(250) NOT NULL,
-              content LONGBLOB NOT NULL
+              fileName VARCHAR(250) NOT NULL
             )";
     try
     {
