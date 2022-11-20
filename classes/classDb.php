@@ -19,15 +19,17 @@ class Db
   }
 
   // Metoda pro vypsani vseho v tabulce
-  function selectAll($tableName)
+  function selectAll($tableName, $orderBy)
   {
     try
     {
       $sql = 'SELECT 
                 * 
               FROM 
-                '.$tableName
-              ;
+                '.$tableName.'
+              ORDER BY 
+                '.$orderBy.'
+              ';
       $result = $this->connection->query($sql);
       return $result;
     }

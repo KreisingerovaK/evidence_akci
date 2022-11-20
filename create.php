@@ -6,7 +6,7 @@ $html->header("Formulář pro vytvoření akce: ");
   $database = new Db();
   $database->connect();
 
-  if(isset($_POST["submit"]))
+  if(isset($_POST["action"]))
   {
     $name      = $_POST["name"];
     $type      = $_POST["type"];
@@ -58,7 +58,7 @@ $html->header("Formulář pro vytvoření akce: ");
       }
     }
 
-    $typeN = $database->selectAll("types");
+    $typeN = $database->selectAll("types", "typeId");
     $numTypes = $typeN->num_rows; 
     for ($x = 0; $x <= $numTypes; $x++) {
       if(!empty($_POST[$x."type"]))
@@ -78,13 +78,13 @@ $html->header("Formulář pro vytvoření akce: ");
   $form = new Form();
   $form->headerForm("form-horizontal", "create.php");
     $form->formField("Název akce","text","name","control-label col-sm-5","","");
-    $types = $database->selectAll("types");
-    $form->formSelect("Typ akce", $types, "type", "");
+    $types = $database->selectAll("types", "typeId");
+    $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName");
     $form->formField("Od","datetime-local","from","","","");
     $form->formField("Do","datetime-local","to","","","");
-    $types = $database->selectAll("types");
+    $types = $database->selectAll("types", "typeId");
     $form->formCheckbox($types);
-    $form->formTextarea("Poznámka","note","control-label col-sm-7","","");
+    $form->formTextarea("Poznámka","note","control-label col-sm-7","");
     $form->formField("Příloha","file","file","","","");
     $form->formField("Počet účastníků","number","numberParticipant","control-label col-sm-1","","");
   $form->endForm("Uložit", "btn btn-secondary col-sm-2");

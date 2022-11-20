@@ -103,19 +103,19 @@ class CreateDb
     $sql = "INSERT INTO types 
               (typeName)
             VALUES 
-              ('test1')
+              ('typ1')
             ;";
     $this->connection->query($sql);
     $sql = "INSERT INTO types 
               (typeName)
             VALUES 
-              ('test2')
+              ('typ2')
             ;";
     $this->connection->query($sql);
     $sql = "INSERT INTO types 
               (typeName)
             VALUES 
-              ('test3')
+              ('typ3')
             ;";
     $this->connection->query($sql);
   }
@@ -124,7 +124,7 @@ class CreateDb
   private function createTableTypesEvents()
   {
     $sql = "CREATE TABLE TypesEvents (
-              typeId INT REFERENCES Types(typeId),
+              typesId INT REFERENCES Types(typeId),
               eventId INT REFERENCES Events(eventId)
             )";
     try
