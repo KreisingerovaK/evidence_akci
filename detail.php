@@ -1,7 +1,7 @@
 <?php 
 require_once('classes/classHtml.php');
 $html = new Html();
-$html->header("Detail akce");
+$html->header("Detail akce", "");
 
   $id = $_GET["id"];
 

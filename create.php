@@ -1,7 +1,7 @@
 <?php 
 require_once('classes/classHtml.php');
 $html = new Html();
-$html->header("Formulář pro vytvoření akce: ");
+$html->header("Formulář pro vytvoření akce: ", "create.js");
 
   $database = new Db();
   $database->connect();
@@ -85,7 +85,15 @@ $html->header("Formulář pro vytvoření akce: ");
     $types = $database->selectAll("types", "typeId");
     $form->formCheckbox($types);
     $form->formTextarea("Poznámka","note","control-label col-sm-7","");
-    $form->formField("Příloha","file","file","","","");
+    //$form->formField("Příloha","file","file","","file1","");
+    echo '<div id="files">';
+      echo '<div class="form-group pb-2">';
+        echo '<label class="control-label col-sm-3">Příloha</label>';
+        echo '<input type="file" value="" class="" name="file" onChange="newFile(0)">';
+      echo '</div>';
+      echo '<div class="form-group pb-2" id="file0">';
+      echo '</div>';
+    echo '</div>';
     $form->formField("Počet účastníků","number","numberParticipant","control-label col-sm-1","","");
   $form->endForm("Uložit", "btn btn-secondary col-sm-2");
 

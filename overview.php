@@ -1,7 +1,7 @@
 <?php 
 require_once('autoloader.php');
 $html = new Html();
-$html->header("Přehled akcí");
+$html->header("Přehled akcí", "");
 
   $database = new Db();
   $database->connect();

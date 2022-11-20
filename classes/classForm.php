@@ -30,7 +30,7 @@ class Form
   }
 
   // Metoda pro vytvoreni selectu formulare s daty z databáze
-  function formSelectDatabase($text, $options, $name, $id, $value, $optionName)
+  function formSelectDatabase($text, $options, $name, $id, $valueColumn, $optionNameColumn)
   {
     $form = '<div class="form-group pb-2">';
       $form .= '<label class="control-label col-sm-3">'.$text.'</label>';
@@ -38,7 +38,7 @@ class Form
         $form .= '<option value="0">Vyberte možnost...</option>';
         while($row = $options->fetch_assoc()) 
         {
-          $form .= '<option value="'.$row[$value].'">'.$row[$optionName].'</option>';
+          $form .= '<option value="'.$row[$valueColumn].'">'.$row[$optionNameColumn].'</option>';
         }
       $form .= '</select>';
       $form .= '<input type="hidden" class="col-sm-auto">';
@@ -97,14 +97,14 @@ class Form
   }
 
   // Metoda pro vytvoreni selectu formulare
-  function formSelectFilter($text, $options, $name, $value, $optionName)
+  function formSelectFilter($text, $options, $name, $valueColumn, $optionNameColumn)
   {
     $form = '<label>'.$text.'&nbsp;</label>';
     $form .= '<select name="'.$name.'" style="margin-right: 10px;">';
       $form .= '<option value="0">Vyberte možnost...</option>';
       while($row = $options->fetch_assoc()) 
       {
-        $form .= '<option value="'.$row[$value].'">'.$row[$optionName].'</option>';
+        $form .= '<option value="'.$row[$valueColumn].'">'.$row[$optionNameColumn].'</option>';
       }
     $form .= '</select>';
     echo $form;
