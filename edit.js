@@ -4,7 +4,7 @@ function newFile(i)
   var y = i +1;
 
   var label = document.createElement("label");
-  label.innerText = "Příloha";
+  label.innerText = "Přidat přílohu";
 
   var labelClass = document.createAttribute("class");
   labelClass.value = "control-label col-sm-3";
@@ -44,9 +44,4 @@ function newFile(i)
   div.setAttributeNode(divClass);
   div.setAttributeNode(id);
   document.getElementById("files").appendChild(div);
-}
-
-function handleData()
-{
-  
 }

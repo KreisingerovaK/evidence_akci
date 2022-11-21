@@ -8,12 +8,12 @@ $html->header("Přehled akcí", "");
 
   $types = $database->selectAll("types","typeId");
   $filter = new Form();
-  $filter->headerForm("form-inline", "overview.php");
+  $filter->headerForm("form-inline", "overview.php", "");
     $filter->formFieldFilter("Název", "text", "name");
     $filter->formSelectFilter("Hlavní typ", $types, "type", "typeId", "typeName");
     $filter->formFieldFilter("Od", "date", "from");
     $filter->formFieldFilter("Do", "date", "to");
-  $filter->endForm("Filtrovat", "btn btn-secondary btn-sm");
+  $filter->endForm("Filtrovat", "btn btn-secondary btn-sm", "");
 
   echo '<br>';
 
@@ -24,11 +24,11 @@ $html->header("Přehled akcí", "");
     $year[$x] = $i;
     $x++;
   }
-  $filter->headerForm("form-inline", "overview.php");
+  $filter->headerForm("form-inline", "overview.php", "");
     $filter->formSelect("Počet akcí v", $month, "month", "měsíc", "");
     $filter->formSelect("/", $year, "year", "rok", "");
     echo '&nbsp;';
-  $filter->endForm("Zobrazit", "btn btn-secondary btn-sm");
+  $filter->endForm("Zobrazit", "btn btn-secondary btn-sm", "");
 
   if(isset($_POST["action"]) && $_POST["action"] == "Zobrazit")
   {

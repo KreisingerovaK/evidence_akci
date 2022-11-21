@@ -12,7 +12,7 @@ $html->header("Detail akce", "");
             e.*,
             GROUP_CONCAT(t.typesId SEPARATOR " ") AS types,
             GROUP_CONCAT(DISTINCT tn.typeName SEPARATOR ", ") AS typeName,
-            GROUP_CONCAT(DISTINCT f.fileName SEPARATOR ", ") AS files
+            GROUP_CONCAT(DISTINCT f.fileName ORDER BY fileId SEPARATOR ", ") AS files
           FROM 
             events e
           RIGHT JOIN 
@@ -20,13 +20,13 @@ $html->header("Detail akce", "");
           ON
             e.eventId = t.eventId
           RIGHT JOIN 
-            file f
-          ON
-            e.eventId = f.eventId
-          RIGHT JOIN 
             types tn
           ON
             t.typesId = tn.typeId
+          RIGHT JOIN 
+            file f
+          ON
+            e.eventId = f.eventId
           WHERE 
             e.eventId = '.$id.'          
           ;';
@@ -79,6 +79,10 @@ $html->header("Detail akce", "");
         $table .= '<td align="left"><strong><a href="upload/'.$file.'" class="link-secondary" download>'.$file.'</a></strong></td>';
       $table .= '</tr>';
     }
+    $table .= '<tr>';
+      $table .= '<td scope="row"></td>';
+      $table .= '<td scope="row" align="left"><a href="edit.php?id='.$id.'" class="btn btn-secondary">Upravit</a></td>';
+    $table .= '</tr>';
     $table .= '</tbody>';
   $table .= '</table>';
 
