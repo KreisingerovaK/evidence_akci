@@ -1,3 +1,4 @@
+// Funkce pro vytvoreni noveho pole pro nahrani souboru
 function newFile(i)
 {
   var x = i;
@@ -17,7 +18,7 @@ function newFile(i)
   type.value = "file";
 
   var name = document.createAttribute("name");
-  name.value = "file"+y;
+  name.value = "fileInput"+y;
 
   var inputClass = document.createAttribute("class");
   inputClass.value = "control-label col-sm-5";
@@ -44,4 +45,25 @@ function newFile(i)
   div.setAttributeNode(divClass);
   div.setAttributeNode(id);
   document.getElementById("files").appendChild(div);
+}
+
+// Fuknce pro kontrolu zda je zvoleny alespon jeden checkbox
+function validation(x)
+{
+  var y = 1;
+  var check = false;
+  for (let i = 0; i < x; i++) 
+  {
+    var checkbox = document.getElementById('check'+y);
+    if(checkbox.checked)
+    {
+      check = true;
+    }
+    y++
+  }
+  if(!check)
+  {
+    window.alert('Zaškrtněte alespoň jedno pole z "Další typ akce"');
+  }
+  return check;
 }

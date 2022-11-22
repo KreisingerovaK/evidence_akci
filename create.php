@@ -6,6 +6,7 @@ $html->header("Vytvoření akce: ", "create.js");
   $database = new Db();
   $database->connect();
 
+  // Ulozeni akce
   if(isset($_POST["action"]))
   {
     $name      = $_POST["name"];
@@ -14,6 +15,9 @@ $html->header("Vytvoření akce: ", "create.js");
     $to        = $_POST["to"];
     $note      = $_POST["note"];
     $numberPar = $_POST["numberParticipant"];
+
+    $name = htmlspecialchars($name);
+    $note = htmlspecialchars($note);
 
     $sql = "INSERT INTO 
               events 
@@ -27,23 +31,36 @@ $html->header("Vytvoření akce: ", "create.js");
               '".$note."'
             );";
     
+    // Ulozeni souboru
     if($database->sql($sql))
     {
       $id = $database->getId();
 
       $i = 0;
-      while(isset($_FILES['file'.$i]))
+      while(isset($_FILES['fileInput'.$i]))
       {
         $dir = "upload/";
-        $fileName = $_FILES["file".$i]["name"];
+        if(!file_exists($dir))
+        {
+          mkdir('upload');
+        }
+        $fileName = $_FILES["fileInput".$i]["name"];
         $targetFile = $dir.$fileName;
         $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-        $file = $_FILES["file".$i]["tmp_name"];
-        $fileSize = $_FILES["file".$i]["size"];
+        $file = $_FILES["fileInput".$i]["tmp_name"];
+        $fileSize = $_FILES["fileInput".$i]["size"];
 
-        if($fileSize > 500000)
+        try
         {
-
+          $MB = 1048576;
+          if($fileSize > 5*$MB)
+          {
+            throw new Exception();
+          }
+        }
+        catch (Exception $e)
+        {
+          die('<strong>Soubor se nepodařilo uložit - je větší než 5MB.</strong><br>');
         }
 
         if(move_uploaded_file($file, $targetFile))
@@ -60,6 +77,7 @@ $html->header("Vytvoření akce: ", "create.js");
         $i++;
       } 
 
+      // Ulozeni dalsich typu
       $typeN = $database->selectAll("types", "typeId");
       $numTypes = $typeN->num_rows; 
       for ($x = 0; $x <= $numTypes; $x++) {
@@ -71,18 +89,21 @@ $html->header("Vytvoření akce: ", "create.js");
                     '".$_POST[$x."type"]."',
                     '".$id."'
                   );";
-    
           $database->sql($sql);
         }
       }
     }
   }
+  $typeN = $database->selectAll("types", "typeId");
+  $numTypes = $typeN->num_rows; 
+
+  // Vytvoreni obsahu do body na strance
   $form = new Form();
-  $form->headerForm("form-horizontal", "create.php", "return handleData()");
+  $form->headerForm("form-horizontal", "create.php", "return validation(".$numTypes.")");
     $form->formFieldRequired("Název akce","text","name","control-label col-sm-5","","");
     $types = $database->selectAll("types", "typeId");
     $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName", "");
-    $form->formField("Od","datetime-local","from","","","");
+    $form->formFieldRequired("Od","datetime-local","from","","","");
     $form->formField("Do","datetime-local","to","","","");
     $types = $database->selectAll("types", "typeId");
     $form->formCheckbox($types, "");
@@ -90,9 +111,9 @@ $html->header("Vytvoření akce: ", "create.js");
     echo '<div id="files">';
       echo '<div class="form-group pb-2">';
         echo '<label class="control-label col-sm-3">Příloha</label>';
-        echo '<input type="file" value="" class="" name="file0" onChange="newFile(0)">';
+        echo '<input type="file" id="file0" name="fileInput0" onChange="newFile(0)">';
       echo '</div>';
-      echo '<div class="form-group pb-2" id="file0">';
+      echo '<div class="form-group pb-2" id="file1">';
       echo '</div>';
     echo '</div>';
     $form->formField("Počet účastníků","number","numberParticipant","control-label col-sm-1","","");

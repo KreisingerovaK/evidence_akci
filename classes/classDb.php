@@ -14,7 +14,17 @@ class Db
     }
     catch (mysqli_sql_exception $e)
     {
-      echo '<strong>Zkontrolujte, zda jsou hodnoty pro připojení do databáze správně: </strong>'.$e->getMessage();
+      die ('        
+        <strong> Nepodařilo se připojit do databáze. </strong> 
+        <br> Zkontrolujte, zda databáze existuje a zda jsou správné údaje pro připojení:  
+        <br> server - <strong>'.CreateDb::DB_SERVER.'</strong>
+        <br> user - <strong>'.CreateDb::DB_USER.'</strong>
+        <br> heslo - <strong>'.CreateDb::DB_PASSWORD.'</strong>
+        <br> jméno databáze - <strong>'.CreateDb::DB_NAME.'</strong>
+        <br>'.$e->getMessage().'
+        <br> Pokud nexistuje databáze, jdete na stránku, kde se vytvoří:
+        <a href="index.php">index.php</a>
+      ');
     }
   }
 
@@ -35,7 +45,13 @@ class Db
     }
     catch (mysqli_sql_exception $e)
     {
-      echo '<strong></strong>'.$e->getMessage();
+      die ('
+        <strong> Chyba v metodě selectAll. </strong> 
+        <br> Zkontrolujte, zda existuje tabulka a sloupeček, podle kterého se mají data srovnat: 
+        <br> tabulka - <strong>'.$tableName.'</strong>
+        <br> sloupeček - <strong>'.$orderBy.'</strong>
+        <br> Chyba je na řádku: <strong>'.$e->getLine().'</strong><br>'.$e->getMessage()
+      );
     }
   }
 
@@ -56,7 +72,13 @@ class Db
     }
     catch (mysqli_sql_exception $e)
     {
-      echo '<strong></strong>'.$e->getMessage();
+      die ('
+        <strong> Chyba v metodě selectWhere. </strong> 
+        <br> Zkontrolujte, zda existuje tabulka a podmínka, podle se mají vybrat data: 
+        <br> tabulka - <strong>'.$tableName.'</strong>
+        <br> podmínka - <strong>'.$where.'</strong>
+        <br> Chyba je na řádku: <strong>'.$e->getLine().'</strong><br>'.$e->getMessage()
+      );
     }
   }
 
@@ -70,7 +92,12 @@ class Db
     }
     catch (mysqli_sql_exception $e)
     {
-      echo '<strong></strong>'.$e->getMessage();
+      die ('
+        <strong> Chyba v metodě sql. </strong> 
+        <br> Zkontrolujte, zda je odeslané sql správně: 
+        <br> sql - <strong>'.$sql.'</strong>
+        <br> Chyba je na řádku: <strong>'.$e->getLine().'</strong><br>'.$e->getMessage()
+      );
     }
   }
 
@@ -84,12 +111,12 @@ class Db
     }
     catch (mysqli_sql_exception $e)
     {
-      echo '<strong></strong>'.$e->getMessage();
+      echo '<strong> Chyba v metodě getId - nepodařilo se získat id.</strong>'.$e->getMessage();
     }
   }
 
   // Metoda pro odpojeni z databaze
-  function disconnect ()
+  function disconnect()
   {
     $this->connection->close();
   }

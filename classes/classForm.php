@@ -6,7 +6,7 @@ class Form
   // Metoda pro vytvoreni hlavicky formulare
   function headerForm($class, $action, $function)
   {
-    $form = '<form onsubmi="'.$function.'" class="'.$class.'" action="'.$action.'" method="post" enctype="multipart/form-data">';
+    $form = '<form onsubmit="'.$function.'" class="'.$class.'" action="'.$action.'" id="form" method="post" enctype="multipart/form-data">';
     echo $form;
   }
 
@@ -47,10 +47,9 @@ class Form
       $form .= '<label class="control-label col-sm-3">'.$text.'</label>';
       $form .= '<select id="'.$id.'" name="'.$name.'" class="control-label col-sm-2">';
         $form .= '<option value="0">Vyberte možnost...</option>';
-        //echo $selected;
         while($row = $options->fetch_assoc()) 
         {
-          if($selected == $row[$optionNameColumn])
+          if($selected == $row[$valueColumn])
           {
             $form .= '<option value="'.$row[$valueColumn].'" selected>'.$row[$optionNameColumn].'</option>';
           }
@@ -85,29 +84,32 @@ class Form
   function formCheckbox($optionsCheck, $optionChecked)
   {
     $form = '<div class="form-group">';
-      $i = 0;
-      while($row = $optionsCheck->fetch_assoc()) 
-      {
-        $form .= '<div style="margin-left: 25%;" class="form-check">';
-          if(isset($optionChecked[$i]))
-          {
-            if($optionChecked[$i] == $row["typeName"])
+      $form .= '<label class="control-label col-sm-3" style="vertical-align: middle; float: left;">Další typ akce</label>';
+      $form .= '<div class="form-group" style="vertical-align: middle;">';
+        $i = 0;
+        while($row = $optionsCheck->fetch_assoc()) 
+        {
+          $form .= '<div style="margin-left: 25%;" class="form-check">';
+            if(isset($optionChecked[$i]))
             {
-              $form .= '<input class="form-check-input col-sm-offset-2 col-sm-5" type="checkbox" id="'.$row["typeId"].'"  name="'.$row["typeId"].'type" value="'.$row["typeId"].'" checked>';
-              $i++;
+              if($optionChecked[$i] == $row["typeId"])
+              {
+                $form .= '<input class="form-check-input" type="checkbox" id="check'.$row["typeId"].'"  name="'.$row["typeId"].'type" value="'.$row["typeId"].'" checked>';
+                $i++;
+              }
+              else
+              {
+                $form .= '<input class="form-check-input" type="checkbox" id="check'.$row["typeId"].'"  name="'.$row["typeId"].'type" value="'.$row["typeId"].'">';
+              }
             }
             else
             {
-              $form .= '<input class="form-check-input col-sm-offset-2 col-sm-5" type="checkbox" id="'.$row["typeId"].'"  name="'.$row["typeId"].'type" value="'.$row["typeId"].'">';
+              $form .= '<input class="form-check-input" type="checkbox" id="check'.$row["typeId"].'"  name="'.$row["typeId"].'type" value="'.$row["typeId"].'">';
             }
-          }
-          else
-          {
-            $form .= '<input class="form-check-input col-sm-offset-2 col-sm-5" type="checkbox" id="'.$row["typeId"].'"  name="'.$row["typeId"].'type" value="'.$row["typeId"].'">';
-          }
-          $form .= '<label class="form-check-label col-sm-5" for="'.$row["typeId"].'">'.$row["typeName"].'</label>';
-        $form .= '</div>';
-      }
+            $form .= '<label class="form-check-label" for="'.$row["typeId"].'">'.$row["typeName"].'</label>';
+          $form .= '</div>';
+        }
+      $form .= '</div>';
     $form .= '</div>';
     echo $form;
   }
@@ -116,14 +118,14 @@ class Form
   function formTextarea($text, $name, $class, $value)
   {
     $form = '<div class="form-group">';
-      $form .= '<label class="control-label col-sm-3" height="150" >'.$text.'</label>';
-      $form .= '<textarea class="'.$class.'" name="'.$name.'" >'.$value.'</textarea>';
+      $form .= '<label class="control-label col-sm-3" style="vertical-align: middle;" height="150" >'.$text.'</label>';
+      $form .= '<textarea class="'.$class.'" style="vertical-align: middle; margin-bottom: 5px;" rows="3" name="'.$name.'" >'.$value.'</textarea>';
       $form .= '<input type="hidden" class="col-sm-6">';
     $form .= '</div>';
     echo $form;
   }
   
-  // Metoda pro vytvoreni pole formulare
+  // Metoda pro vytvoreni pole formulare do filtru
   function formFieldFilter($text, $type, $name)
   {
       $form = '<label>'.$text.'&nbsp;</label>';
@@ -131,7 +133,7 @@ class Form
     echo $form;
   }
 
-  // Metoda pro vytvoreni selectu formulare
+  // Metoda pro vytvoreni selectu formulare do filtru
   function formSelectFilter($text, $options, $name, $valueColumn, $optionNameColumn)
   {
     $form = '<label>'.$text.'&nbsp;</label>';

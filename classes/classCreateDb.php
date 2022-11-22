@@ -19,7 +19,14 @@ class CreateDb
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Zkontrolujte, zda jsou hodnoty pro připojení do databáze správně: </strong>'.$e->getMessage());
+      die ('
+        <strong> Nelze se připojit do databáze. </strong> 
+        <br> Zkontrolujte, zda jsou přístupové údaje správně: 
+        <br> server - <strong>'.self::DB_SERVER.'</strong>
+        <br> uživatel - <strong>'.self::DB_USER.'</strong>
+        <br> heslo - <strong>'.self::DB_PASSWORD.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
     }
   }
   
@@ -32,10 +39,18 @@ class CreateDb
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Zkontrolujte, zda jsou hodnoty pro připojení do databáze správně: </strong>'.$e->getMessage());
+      die ('
+        <strong> Nelze se připojit do databáze. </strong> 
+        <br> Zkontrolujte, zda jsou přístupové údaje správně: 
+        <br> server - <strong>'.self::DB_SERVER.'</strong>
+        <br> uživatel - <strong>'.self::DB_USER.'</strong>
+        <br> heslo - <strong>'.self::DB_PASSWORD.'</strong>
+        <br> jméno databáze - <strong>'.self::DB_NAME.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
     }
   }
-
+  
   // Metoda pro odpojeni z databaze
   private function disconnect()
   {
@@ -48,7 +63,7 @@ class CreateDb
     self::connectFirst();
     try
     {
-      $sql = "CREATE DATABASE ".self::DB_NAME;
+      $sql = "CREATE DATABASE IF NOT EXISTS ".self::DB_NAME;
       $this->connection->query($sql);
     }
     catch (mysqli_sql_exception $e)
@@ -66,7 +81,7 @@ class CreateDb
   // Metoda pro vytvoreni tabulky akce
   private function createTableEvents()
   {
-    $sql = "CREATE TABLE Events (
+    $sql = "CREATE TABLE IF NOT EXISTS Events (
               eventId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
               eventName VARCHAR(250) NOT NULL,
               typeId INT REFERENCES Types(typeId), 
@@ -81,14 +96,19 @@ class CreateDb
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Tabulku Events se nepodařilo vytvořit: </strong>'.$e->getMessage());
+      die ('
+        <strong> Tabulku Events se nepodařilo vytvořit </strong> 
+        <br> Zkontrolujte, zda je sql správně: 
+        <br> sql - <strong>'.$sql.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
     }
   }
 
   // Metoda pro vytvoreni tabulky s typy akci 
   private function createTableTypes()
   {
-    $sql = "CREATE TABLE Types (
+    $sql = "CREATE TABLE IF NOT EXISTS Types (
               typeId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
               typeName VARCHAR(250) NOT NULL
             )";
@@ -98,7 +118,12 @@ class CreateDb
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Tabulku Types se nepodařilo vytvořit: </strong>'.$e->getMessage());
+      die ('
+        <strong> Tabulku Types se nepodařilo vytvořit </strong> 
+        <br> Zkontrolujte, zda je sql správně: 
+        <br> sql - <strong>'.$sql.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
     }
     $sql = "INSERT INTO types 
               (typeName)
@@ -117,13 +142,25 @@ class CreateDb
             VALUES 
               ('typ3')
             ;";
-    $this->connection->query($sql);
+    try
+    {
+      $this->connection->query($sql);
+    }
+    catch (mysqli_sql_exception $e)
+    {
+      die ('
+        <strong> Tabulku Types se nepodařilo naplnit daty </strong> 
+        <br> Zkontrolujte, zda je sql správně: 
+        <br> sql - <strong>'.$sql.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
+    }
   }
 
   // Metoda pro vytvoreni tabulky typy akci
   private function createTableTypesEvents()
   {
-    $sql = "CREATE TABLE TypesEvents (
+    $sql = "CREATE TABLE IF NOT EXISTS TypesEvents (
               typesId INT REFERENCES Types(typeId),
               eventId INT REFERENCES Events(eventId)
             )";
@@ -133,14 +170,19 @@ class CreateDb
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Tabulku TypesEvents se nepodařilo vytvořit: </strong>'.$e->getMessage());
+      die ('
+        <strong> Tabulku TypesEvents se nepodařilo vytvořit </strong> 
+        <br> Zkontrolujte, zda je sql správně: 
+        <br> sql - <strong>'.$sql.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
     }
   }
 
   // Metoda pro vytvoreni tabulky prilohy
   private function createTableFile()
   {
-    $sql = "CREATE TABLE File (
+    $sql = "CREATE TABLE IF NOT EXISTS File (
               fileId INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
               eventId INT REFERENCES Events(eventId),
               fileName VARCHAR(250) NOT NULL
@@ -151,7 +193,12 @@ class CreateDb
     }
     catch (mysqli_sql_exception $e)
     {
-      die ('<strong>Tabulku File se nepodařilo vytvořit: </strong>'.$e->getMessage());
+      die ('
+        <strong> Tabulku File se nepodařilo vytvořit </strong> 
+        <br> Zkontrolujte, zda je sql správně: 
+        <br> sql - <strong>'.$sql.'</strong>
+        <br> Chyba:'.$e->getMessage()
+      );
     }
   }
 }

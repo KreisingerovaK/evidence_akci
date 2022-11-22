@@ -6,6 +6,7 @@ $html->header("Přehled akcí", "");
   $database = new Db();
   $database->connect();
 
+  // Vytvori se formular pro filtr
   $types = $database->selectAll("types","typeId");
   $filter = new Form();
   $filter->headerForm("form-inline", "overview.php", "");
@@ -17,6 +18,7 @@ $html->header("Přehled akcí", "");
 
   echo '<br>';
 
+  // Vytvori se pocitadlo akci v mesici/roce
   $month = array ("leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec");
   $year = array ();
   $x = 0;
@@ -58,8 +60,9 @@ $html->header("Přehled akcí", "");
 
   echo '<br>';
 
+  // Vytvoreni hlavicky tabulky
   $table = '<table class="table table-hover">';
-    $table .= '<thead>';
+    $table .= '<thead class="table-secondary">';
       $table .= '<tr>';
         $table .= '<td scope="col" align="left" width="250"><strong>Název akce</strong></td>';
         $table .= '<td scope="col" align="center" width="100"><strong>Hlavní typ</strong></td>';
@@ -75,6 +78,7 @@ $html->header("Přehled akcí", "");
       $numberParticipant = 0;
       $numberRow         = 0;
 
+      // Pokud se ma filtrovat, naplni se tabulka podle filtru
       if(isset($_POST["action"]) && $_POST["action"] == "Filtrovat")
       {
         $filterArray = array();
@@ -90,7 +94,7 @@ $html->header("Přehled akcí", "");
         if(!empty($_POST["to"])){
           $filterArray[] = 'DATE(eventTo) = "'.$_POST["to"].'"';
         }
-
+        
         if(empty($filterArray))
         {
           $events = $database->selectAll("events", "eventId DESC");
@@ -124,8 +128,22 @@ $html->header("Přehled akcí", "");
             );
             $rowDateTime = $dateTime->fetch_assoc();
 
+            if($rowDateTime["toDate"] == "00.00.0000")
+            {
+              $rowDateTime["toDate"] = "";
+            }
+            if($rowDateTime["toDate"] == "00:00")
+            {
+              $rowDateTime["toTime"] = "";
+            }  
+
             $nameType = $database->selectWhere("types", "typeId = ".$row["typeId"]);
-            $nameType = $nameType->fetch_assoc();           
+            $nameType = $nameType->fetch_assoc(); 
+            
+            if(empty($nameType["typeName"]))
+            {
+              $nameType["typeName"] = '';
+            }
 
             $table .= '<tr>';
               $table .= '<td scope="row" width="250"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$row["eventName"].'</a></td>';
@@ -146,39 +164,48 @@ $html->header("Přehled akcí", "");
           $table .= '</tfoot>';
         }
       }
+      // Jinak se naplni tabulka vsemi zaznamy
       else
       {
         $events = $database->selectAll("events", "eventId DESC");
         while($row = $events->fetch_assoc()) 
         {
-          $dateTime = $database->sql('
-            SELECT 
-              DATE_FORMAT(eventFrom, "%d.%m.%Y"), 
-              DATE_FORMAT(eventFrom, "%H:%i"),
-              DATE_FORMAT(eventTo, "%d.%m.%Y"),
-              DATE_FORMAT(eventTo, "%H:%i")
-            FROM 
-              events 
-            WHERE 
-              eventId = '.$row["eventId"]
-          );
-          $rowDateTime = $dateTime->fetch_assoc();
-          
-          $nameType = $database->selectWhere("types", "typeId = ".$row["typeId"]);
-          $nameType = $nameType->fetch_assoc();
-          
-          if(empty($nameType["typeName"]))
-          {
-            $nameType["typeName"] = '';
-          }
+            $dateTime = $database->sql('
+              SELECT 
+                DATE_FORMAT(eventFrom, "%d.%m.%Y") AS fromDate, 
+                DATE_FORMAT(eventFrom, "%H:%i") AS fromTime,
+                DATE_FORMAT(eventTo, "%d.%m.%Y") AS toDate,
+                DATE_FORMAT(eventTo, "%H:%i") AS toTime
+              FROM 
+                events 
+              WHERE 
+                eventId = '.$row["eventId"]
+            );
+            $rowDateTime = $dateTime->fetch_assoc();
+
+            $nameType = $database->selectWhere("types", "typeId = ".$row["typeId"]);
+            $nameType = $nameType->fetch_assoc();
+            
+            if(empty($nameType["typeName"]))
+            {
+              $nameType["typeName"] = '';
+            }
+            if($rowDateTime["toDate"] == "00.00.0000")
+            {
+              $rowDateTime["toDate"] = "";
+            }
+            if($rowDateTime["toDate"] == "00:00")
+            {
+              $rowDateTime["toTime"] = "";
+            }  
 
           $table .= '<tr>';
             $table .= '<td scope="row" width="250"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$row["eventName"].'</a></td>';
             $table .= '<td width="50" align="center" ><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$nameType["typeName"].'</a></td>';
-            $table .= '<td align="center"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["DATE_FORMAT(eventFrom, \"%d.%m.%Y\")"].'</a></td>';
-            $table .= '<td align="left" width="50"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["DATE_FORMAT(eventFrom, \"%H:%i\")"].'</a></td>';
-            $table .= '<td align="center"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["DATE_FORMAT(eventTo, \"%d.%m.%Y\")"].'</a></td>';
-            $table .= '<td align="left" width="50"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["DATE_FORMAT(eventTo, \"%H:%i\")"].'</a></td>';
+            $table .= '<td align="center"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["fromDate"].'</a></td>';
+            $table .= '<td align="left" width="50"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["fromTime"].'</a></td>';
+            $table .= '<td align="center"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["toDate"].'</a></td>';
+            $table .= '<td align="left" width="50"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$rowDateTime["toTime"].'</a></td>';
             $table .= '<td align="right" width="150"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$row["numberParticipant"].'</a></td>';
           $table .= '</tr>';
           $numberParticipant += $row["numberParticipant"];

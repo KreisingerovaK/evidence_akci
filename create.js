@@ -1,7 +1,8 @@
+// Funkce pro vytvoreni noveho pole pro nahrani souboru
 function newFile(i)
 {
-  var x = i;
   var y = i +1;
+  var x = y +1;
 
   var label = document.createElement("label");
   label.innerText = "Příloha";
@@ -17,7 +18,7 @@ function newFile(i)
   type.value = "file";
 
   var name = document.createAttribute("name");
-  name.value = "file"+y;
+  name.value = "fileInput"+y;
 
   var inputClass = document.createAttribute("class");
   inputClass.value = "control-label col-sm-5";
@@ -30,13 +31,13 @@ function newFile(i)
   input.setAttributeNode(inputClass);
   input.setAttributeNode(onChange);
 
-  document.getElementById("file"+x).appendChild(label);
-  document.getElementById("file"+x).appendChild(input);
+  document.getElementById("file"+y).appendChild(label);
+  document.getElementById("file"+y).appendChild(input);
 
   var div  = document.createElement("div");
 
   var id = document.createAttribute("id");
-  id.value = "file"+y;
+  id.value = "file"+x;
 
   var divClass = document.createAttribute("class");
   divClass.value = "form-group pb-2";
@@ -46,7 +47,25 @@ function newFile(i)
   document.getElementById("files").appendChild(div);
 }
 
-function handleData()
+// Fuknce pro kontrolu zda je zvoleny alespon jeden checkbox
+function validation(x)
 {
-  
+  var y = 1;
+  var check = false;
+  for (let i = 0; i < x; i++) 
+  {
+    var checkbox = document.getElementById('check'+y);
+    if(checkbox.checked)
+    {
+      check = true;
+    }
+    y++
+  }
+  if(!check)
+  {
+    window.alert('Zaškrtněte alespoň jedno pole z "Další typ akce"');
+    return check;
+  }
+
+  return;
 }

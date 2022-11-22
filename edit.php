@@ -8,6 +8,7 @@ $html->header("Úprava akce", "edit.js");
   $database = new Db();
   $database->connect();
 
+  // Pokud jsou odeslana data, tak se ulozi
   if(isset($_POST["action"]))
   {
     $name      = $_POST["name"];
@@ -16,6 +17,9 @@ $html->header("Úprava akce", "edit.js");
     $to        = $_POST["to"];
     $note      = $_POST["note"];
     $numberPar = $_POST["numberParticipant"];
+
+    $name = htmlspecialchars($name);
+    $note = htmlspecialchars($note);
 
     $sql = 'UPDATE 
               events 
@@ -31,15 +35,20 @@ $html->header("Úprava akce", "edit.js");
             ;';
     if($database->sql($sql))
     {
+      // Ukladani souboru
       $i = 0;
-      while(isset($_FILES['file'.$i]))
+      while(isset($_FILES['fileInput'.$i]))
       {
         $dir = "upload/";
-        $fileName = $_FILES["file".$i]["name"];
+        if(!file_exists($dir))
+        {
+          mkdir('upload');
+        }
+        $fileName = $_FILES["fileInput".$i]["name"];
         $targetFile = $dir.$fileName;
         $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-        $file = $_FILES["file".$i]["tmp_name"];
-        $fileSize = $_FILES["file".$i]["size"];
+        $file = $_FILES["fileInput".$i]["tmp_name"];
+        $fileSize = $_FILES["fileInput".$i]["size"];
 
         if($fileSize > 500000)
         {
@@ -60,11 +69,13 @@ $html->header("Úprava akce", "edit.js");
         $i++;
       } 
 
+      // Ukladani dalsich typu
       $typeN = $database->selectAll("types", "typeId");
       $numTypes = $typeN->num_rows; 
       for ($x = 0; $x <= $numTypes; $x++) {
         if(!empty($_POST[$x."type"]))
         {
+          // Kontrola, zda uz tato akce neni s timto typem spojena
           $sql = " SELECT 
                     *
                   FROM 
@@ -76,6 +87,7 @@ $html->header("Úprava akce", "edit.js");
                   ";
           $numberRow = $database->sql($sql);
           $numberRow = $numberRow->num_rows;
+          // Pokud ne, vytvori se novy zaznam
           if($numberRow <= 0)
           {
             $sql = "INSERT INTO 
@@ -90,6 +102,7 @@ $html->header("Úprava akce", "edit.js");
         }
         else
         {
+          // Kdyz je policko prazdne, smaze se spojeni mezi typem a touto akci (pokud to existuje)
           $sql = " SELECT 
                     *
                   FROM 
@@ -119,12 +132,11 @@ $html->header("Úprava akce", "edit.js");
     header('Location: detail.php?id='.$id);
   }
 
+  // Nactou se informace o akci a jejich typech
   $sql = 'SELECT 
             e.*,
             GROUP_CONCAT(DISTINCT t.typesId ORDER BY t.typesId ASC SEPARATOR " " ) AS types,
-            GROUP_CONCAT(DISTINCT tn.typeName ORDER BY tn.typeId ASC SEPARATOR ", ") AS typeName,
-            GROUP_CONCAT(DISTINCT f.fileId ORDER BY fileId ASC SEPARATOR ", ") AS filesId,
-            GROUP_CONCAT(DISTINCT f.fileName ORDER BY fileId ASC SEPARATOR ", " ) AS filesName    
+            GROUP_CONCAT(tn.typeName ORDER BY tn.typeId ASC SEPARATOR ", ") AS typeName    
           FROM 
             events e
           RIGHT JOIN 
@@ -135,6 +147,19 @@ $html->header("Úprava akce", "edit.js");
             types tn
           ON
             t.typesId = tn.typeId
+          WHERE 
+            e.eventId = '.$id.'          
+          ;';
+  $event = $database->sql($sql);
+  $row = $event->fetch_assoc();
+
+  // Nactou se informace ojejich souborech
+  $sql = 'SELECT 
+            e.eventId,
+            GROUP_CONCAT(DISTINCT f.fileId ORDER BY fileId ASC SEPARATOR ", ") AS filesId,
+            GROUP_CONCAT(f.fileName ORDER BY fileId ASC SEPARATOR ", " ) AS filesName   
+          FROM 
+            events e
           RIGHT JOIN 
             file f
           ON
@@ -142,8 +167,8 @@ $html->header("Úprava akce", "edit.js");
           WHERE 
             e.eventId = '.$id.'          
           ;';
-  $event = $database->sql($sql);
-  $row = $event->fetch_assoc();
+  $file = $database->sql($sql);
+  $file = $file->fetch_assoc();
 
   $nameType = $database->selectWhere("types", "typeId = ".$row["typeId"]);
   $nameType = $nameType->fetch_assoc();
@@ -161,15 +186,19 @@ $html->header("Úprava akce", "edit.js");
     $row["eventTo"] = '';
   }
  
-  $files = explode(", ",$row["filesName"]);
-  $filesId = explode(", ",$row["filesId"]);
-  $typesEvent = explode(", ",$row["typeName"]);
+  $files = explode(", ",$file["filesName"]);
+  $filesId = explode(", ",$file["filesId"]);
+  $typesEvent = explode(" ",$row["types"]);
   
+  $typeN = $database->selectAll("types", "typeId");
+  $numTypes = $typeN->num_rows; 
+  
+  // Vytvoreni obsahu do body na strance
   $form = new Form();
-  $form->headerForm("form-horizontal", "edit.php?id=".$id, "return handleData()");
+  $form->headerForm("form-horizontal", "edit.php?id=".$id, "return validation(".$numTypes.")");
     $form->formFieldRequired("Název akce","text","name","control-label col-sm-5","",$row["eventName"]);
     $types = $database->selectAll("types", "typeId");
-    $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName", $nameType["typeName"]);
+    $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName", $nameType["typeId"]);
     $form->formField("Od","datetime-local","from","","", $row["eventFrom"]);
     $form->formField("Do","datetime-local","to","","", $row["eventTo"]);
     $types = $database->selectAll("types", "typeId");
@@ -194,7 +223,7 @@ $html->header("Úprava akce", "edit.js");
     echo '<div id="files">';
       echo '<div class="form-group pb-2">';
         echo '<label class="control-label col-sm-3">Přidat přílohu</label>';
-        echo '<input type="file" value="" class="" name="file0" onChange="newFile(0)">';
+        echo '<input type="file" name="fileInput0" onChange="newFile(0)">';
       echo '</div>';
       echo '<div class="form-group pb-2" id="file0">';
       echo '</div>';
