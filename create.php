@@ -104,7 +104,7 @@ $html->header("Vytvoření akce: ", "create.js");
     $types = $database->selectAll("types", "typeId");
     $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName", "");
     $form->formFieldRequired("Od","datetime-local","from","","","");
-    $form->formField("Do","datetime-local","to","","","");
+    $form->formFieldRequired("Do","datetime-local","to","","","");
     $types = $database->selectAll("types", "typeId");
     $form->formCheckbox($types, "");
     $form->formTextarea("Poznámka","note","control-label col-sm-7","");

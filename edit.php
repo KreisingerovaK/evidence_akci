@@ -50,9 +50,17 @@ $html->header("Úprava akce", "edit.js");
         $file = $_FILES["fileInput".$i]["tmp_name"];
         $fileSize = $_FILES["fileInput".$i]["size"];
 
-        if($fileSize > 500000)
+        try
         {
-
+          $MB = 1048576;
+          if($fileSize > 5*$MB)
+          {
+            throw new Exception();
+          }
+        }
+        catch (Exception $e)
+        {
+          die('<strong>Soubor se nepodařilo uložit - je větší než 5MB.</strong><br>');
         }
 
         if(move_uploaded_file($file, $targetFile))
@@ -170,22 +178,6 @@ $html->header("Úprava akce", "edit.js");
   $file = $database->sql($sql);
   $file = $file->fetch_assoc();
 
-  $nameType = $database->selectWhere("types", "typeId = ".$row["typeId"]);
-  $nameType = $nameType->fetch_assoc();
-  
-  if(empty($nameType["typeName"]))
-  {
-    $nameType["typeName"] = '';
-  }
-  if($row["eventFrom"] == "0000-00-00 00:00:00")
-  {
-    $row["eventFrom"] = '';
-  }
-  if($row["eventTo"] == "0000-00-00 00:00:00")
-  {
-    $row["eventTo"] = '';
-  }
- 
   $files = explode(", ",$file["filesName"]);
   $filesId = explode(", ",$file["filesId"]);
   $typesEvent = explode(" ",$row["types"]);
@@ -198,9 +190,9 @@ $html->header("Úprava akce", "edit.js");
   $form->headerForm("form-horizontal", "edit.php?id=".$id, "return validation(".$numTypes.")");
     $form->formFieldRequired("Název akce","text","name","control-label col-sm-5","",$row["eventName"]);
     $types = $database->selectAll("types", "typeId");
-    $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName", $nameType["typeId"]);
-    $form->formField("Od","datetime-local","from","","", $row["eventFrom"]);
-    $form->formField("Do","datetime-local","to","","", $row["eventTo"]);
+    $form->formSelectDatabase("Hlavní typ akce", $types, "type", "", "typeId", "typeName", $row["typeId"]);
+    $form->formFieldRequired("Od","datetime-local","from","","", $row["eventFrom"]);
+    $form->formFieldRequired("Do","datetime-local","to","","", $row["eventTo"]);
     $types = $database->selectAll("types", "typeId");
     $form->formCheckbox($types, $typesEvent);
     $form->formTextarea("Poznámka","note","control-label col-sm-7",$row["note"]);

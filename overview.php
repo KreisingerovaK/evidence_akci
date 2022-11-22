@@ -128,15 +128,6 @@ $html->header("Přehled akcí", "");
             );
             $rowDateTime = $dateTime->fetch_assoc();
 
-            if($rowDateTime["toDate"] == "00.00.0000")
-            {
-              $rowDateTime["toDate"] = "";
-            }
-            if($rowDateTime["toDate"] == "00:00")
-            {
-              $rowDateTime["toTime"] = "";
-            }  
-
             $nameType = $database->selectWhere("types", "typeId = ".$row["typeId"]);
             $nameType = $nameType->fetch_assoc(); 
             
@@ -190,14 +181,6 @@ $html->header("Přehled akcí", "");
             {
               $nameType["typeName"] = '';
             }
-            if($rowDateTime["toDate"] == "00.00.0000")
-            {
-              $rowDateTime["toDate"] = "";
-            }
-            if($rowDateTime["toDate"] == "00:00")
-            {
-              $rowDateTime["toTime"] = "";
-            }  
 
           $table .= '<tr>';
             $table .= '<td scope="row" width="250"><a class="link-dark" style="text-decoration: none;" href="detail.php?id='.$row["eventId"].'">'.$row["eventName"].'</a></td>';
