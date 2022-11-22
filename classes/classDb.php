@@ -22,8 +22,8 @@ class Db
         <br> heslo - <strong>'.CreateDb::DB_PASSWORD.'</strong>
         <br> jméno databáze - <strong>'.CreateDb::DB_NAME.'</strong>
         <br>'.$e->getMessage().'
-        <br> Pokud nexistuje databáze, jdete na stránku, kde se vytvoří:
-        <a href="index.php">index.php</a>
+        <br> Pokud nexistuje databáze, klikněte na odkaz:
+        <a href="index.php">Vytvořit databázi</a>
       ');
     }
   }
